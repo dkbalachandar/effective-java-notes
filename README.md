@@ -1,15 +1,12 @@
-# Effective Java - 3rd edition Notes
+## Effective Java - 3rd edition Notes
 
 #### Disclaimer
 
-This is a summary of the book "Effective Java by Joshua Bloch". The below are my personal notes and I hope it's not a copyright infringement. If it is, please contact me in order to remove this file from github.
+This is a summary of the book "Effective Java"  by Joshua Bloch. The below are my personal notes and I hope it's not a copyright infringement. If it is, please contact me in order to remove this file from github.
 
 ### Chapter 2: Creating and Destroying Objects
 
-This chapter concerns creating and destroying objects. When and how to
-create them, when and how to avoid creating them, how to ensure they are
-destroyed in a timely manner, and how to manage any cleanup actions that
-must precede their destruction.
+This chapter concerns creating and destroying objects. When and how to create them, when and how to avoid creating them, how to ensure they are destroyed in a timely manner, and how to manage any cleanup actions that must precede their destruction.
 
 #### Item 1: Consider static factory methods instead of constructors
 Instead of adding multiple constructors for a class, we can create static factory methods which has advantages and disadvantages.
@@ -52,11 +49,13 @@ public static Boolean valueOf(boolean b) {
 
 #### Item 2: Consider a builder when faced with many constructor parameters
 Static factories and constructors have some limitation and they do not scale well to large number of optional parameters. So, we may use any one of the below options.
-1.	Telescoping constructor pattern – provide a constructor with only required parameters, another one with a single optional parameter, a third with two optional parameters and so on. It still works but its harder to read it.
-2.	JavaBean pattern – Create a parameter less constructor and then call the setter methods to set the required parameters and each optional parameter. A JavaBean may be in an inconsistent state partway through its construction and also it prevents the possibility of making a class immutable. 
-3.	Builder Pattern - Combines the safety of the telescoping pattern and the readability of JavaBean pattern.  In order to create an object, we have to create Builder class. So, the cost of creating builder class is the disadvantage here. It’s good when constructors or static factories would have more than a handful of parameters
+1.Telescoping constructor pattern – provide a constructor with only required parameters, another one with a single optional parameter, a third with two optional parameters and so on. It still works but its harder to read it.
+2.JavaBean pattern – Create a parameter less constructor and then call the setter methods to set the required parameters and each optional parameter. A JavaBean may be in an inconsistent state partway through its construction and also it prevents the possibility of making a class immutable. 
+3.Builder Pattern - Combines the safety of the telescoping pattern and the readability of JavaBean pattern.  In order to create an object, we have to create Builder class. So, the cost of creating builder class is the disadvantage here. It’s good when constructors or static factories would have more than a handful of parameters
 
 #### Item 3: Enforce the singleton property with a private constructor or an enum type
+
+There are different ways to create singletons.
 We can create a private constructor in the class and static factory method to return an instance of that class.  We can throw an exception in the private constructor if client code access it through reflections.  
 
 ````
@@ -68,7 +67,6 @@ public class Elvis {
 }
 
 ````
-
 A single-element enum type is often the best way to implement a singleton.
 
 ````
@@ -134,9 +132,11 @@ The variable Sum is declared as Long so every time when we perform the add opera
 
 “Don’t create a new object when you should reuse an existing one,”
 
-#### Item 6: Eliminate obsolete object references
+#### Item 7: Eliminate obsolete object references
 
-Nulling out object references should be the exception rather than the norm. Whenever a class manages its own memory, the programmer should be alert for memory leaks. 
+Nulling out object references should be the exception rather than the norm. Do not overcompensate by nulling out every object. 
+Whenever a class manages its own memory, the programmer should be alert for memory leaks. 
+
 For example, Stack.
 ```
 public Object pop() {
@@ -147,7 +147,10 @@ public Object pop() {
   return result;
 }
 ```
-Another common source of memory leaks are caches,  listeners and other callbacks.
+Another common source of memory leaks is caches, Hence use WeakHashMap to represent the cache.
+A third common source of memory leaks is lisenters and other callbacks. If clients register callbacks, but never deregister them explicitly. To solve it store only weak references to them, for instance storing them as keys in a WeakHashMap.
+
+Use a Heap Profiler tool to find unseen memory leaks.
 
 #### Item 8: Avoid finalizers and cleaners
 Finalizers are unpredictable, often dangerous, and generally unnecessary. 
@@ -201,17 +204,18 @@ Public classes should never expose mutable fields. Its less harmful though still
 
 #### Item 17: Minimize Mutability
 An immutable class is simple a class whose instance can’t be modified. All of the information contained in each instance is fixed for the lifetime of the object. 
-1.	Don’t provide methods that modify the object’s state
-2.	Ensure that the class can’t be extended
-3.	Make all fields final
-4.	Make all fields private
-5.	Ensure excessive access to any mutable components
+1.Don’t provide methods that modify the object’s state
+2.Ensure that the class can’t be extended
+3.Make all fields final
+4.Make all fields private
+5.Ensure excessive access to any mutable components
 
 #### Item 18: Favor composition over inheritance
 Inheritance violates the encapsulation. In other way, a subclass depends on the implementation details of its superclass for its proper function. 
+
 With inheritance, you don't know how your class will react with a new version of its superclass. For example, you may have added a new method whose signature will happen to be the same than a method of its superclass in the next release. You will then override a method without even knowing it.
-Also, if there is a flaw in the API of the superclass you will suffer from it too. With composition, you can define your own API for your class.
-As a rule of thumb, to know if you need to choose inheritance over composition, you need to ask yourself if B is really a subtype of A.
+
+Also, if there is a flaw in the API of the superclass you will suffer from it too. With composition, you can define your own API for your class. As a rule of thumb, to know if you need to choose inheritance over composition, you need to ask yourself if B is really a subtype of A.
 
 ``` 
 //Wrapper class – Uses composition in place of inheritance.
@@ -253,14 +257,18 @@ public class ForwardingSet<E> implements Set<E> {
 #### Item 19: Design and document for inheritance or else prohibit it
 
 The class must document its self-use of overridable methods. 
+
 To document a class so that it can be safely sub classed, you must describe implementations details. To allow programmers to write efficient subclasses without undue pain, a class may have to provide hooks into its internal working in the form of judiciously chosen protected methods. The only way to test a class designed for inheritance is to write subclasses. You must test your class by writing subclasses before you release it.
+
 Constructor must not invoke overridable methods.
+
 If a class is not designed and documented for inheritance it should be me made forbidden to inherit it, either by making it final, or making its constructors private (or package private) and use static factories.
 
 #### Item 20: Prefer Interfaces to Abstract Classes
 
 ### Item 21: Design interfaces for posterity
 With Java 8, it's now possible to add new methods in interfaces without breaking old implementations thanks to default methods. But It needs to be done carefully since it can still break old implementations that will fail at runtime.
+
 For example, removeIf() method was added to the Collection interface in Java 8. The SynchronizedCollection class of Apache commons library implemented this interface but does not implement removeIf() method. So when we call removeIf on a SynchronizedCollection invokes the removeIf method of Collection interface and it throws a ConcurrentModificationException or other unspecified behavior may happen.
 
 #### Item 22: Use interfaces only to define types
@@ -286,6 +294,7 @@ public class PhysicalConstants {
 Tagged classes are verbose, error-prone and inefficient.
 They have lot of boilerplate code, bad readability, they increase the memory footprint and more shortcomings.
 For example,
+
 ```
 // Tagged Class
 	class Figure{
@@ -417,7 +426,6 @@ Generic methods, like generic types, are safer and easier to use than methods re
 
 #### Item 31: Use bounded wildcards to increase API flexibility
 
-
 ### Chapter: 6 Enums and annotations
 
 #### Item 34: Use Enum instead of int constants
@@ -531,13 +539,18 @@ Array Constructor	int[]::new	len -> new int[len]
 Some tasks are best accomplished with streams, and others with iteration. Many tasks are best accomplished by combining the two approaches. There are no hard and fast rules for choosing which approach to use for a task, but there are some useful heuristics. In many cases, it will be clear which approach to use; in some cases, it won’t. If you’re not sure whether a task is better served by streams or iteration, try both and see which works better.
 
 #### Item 46: Prefer side-effect-free functions in streams
-The essence of programming stream pipelines is side-effect free function objects. This applies to all of the many function objects passed to streams and related objects. The terminal operation forEach should only be used to report the result of a computation performed by a stream, not to perform the computation. In order to use streams properly, you have to know about collectors. The most important collector factories are toList, toSet, toMap, groupingBy, and joining
+The essence of programming stream pipelines is side-effect free function objects. This applies to all of the many function objects passed to streams and related objects. The terminal operation forEach should only be used to report the result of a computation performed by a stream, not to perform the computation. 
+In order to use streams properly, you have to know about collectors. The most important collector factories are toList, toSet, toMap, groupingBy, and joining
 
 #### Item 47 Prefer Collection to Stream as a return type
-When writing a method that returns a sequence of elements, remember that some of your users may want to process them as a stream while others may want to iterate over them. Try to accommodate both groups. If it’s feasible to return a collection, do so. If you already have the elements in a collection or the number of elements in the sequence is small enough to justify creating a new one, return a standard collection such as ArrayList. Otherwise, consider implementing a custom collection as we did for the power set. If it isn’t feasible to return a collection, return a stream or iterable, whichever seems more natural. If, in a future Java release, the Stream interface declaration is modified to extend Iterable, then you should feel free to return streams because they will allow for both stream processing and iteration.
+When writing a method that returns a sequence of elements, remember that some of your users may want to process them as a stream while others may want to iterate over them. Try to accommodate both groups. If it’s feasible to return a collection, do so. 
+If you already have the elements in a collection or the number of elements in the sequence is small enough to justify creating a new one, return a standard collection such as ArrayList. Otherwise, consider implementing a custom collection as we did for the power set. 
+If it isn’t feasible to return a collection, return a stream or iterable, whichever seems more natural. If, in a future Java release, the Stream interface declaration is modified to extend Iterable, then you should feel free to return streams because they will allow for both stream processing and iteration.
 
 #### Item 48: Use caution when making streams parallel
-Do not even attempt to parallelize a stream pipeline unless you have good reason to believe that it will preserve the correctness of the computation and increase its speed. The cost of inappropriately parallelizing a stream can be a program failure or performance disaster. If you believe that parallelism may be justified, ensure that your code remains correct when run in parallel, and do careful performance measurements under realistic 257 conditions. If your code remains correct and these experiments bear out your suspicion of increased performance, then and only then parallelize the stream in production code.
+Do not even attempt to parallelize a stream pipeline unless you have good reason to believe that it will preserve the correctness of the computation and increase its speed. The cost of inappropriately parallelizing a stream can be a program failure or performance disaster.
+
+If you believe that parallelism may be justified, ensure that your code remains correct when run in parallel, and do careful performance measurements under realistic 257 conditions. If your code remains correct and these experiments bear out your suspicion of increased performance, then and only then parallelize the stream in production code.
 
 
 ### Chapter: 8 Methods
@@ -629,16 +642,17 @@ Keep methods small and focused. Don’t combine two many activities in the same 
 #### Item 58: Prefer For Each loops to Traditional For Loops
 For Loop provides compelling advantages over the traditional for loop in clarity, flexibility and bug prevention, with no performance penalty. Use for-each loops in preference to for loops wherever you can.
 There are situations where you can’t use for each loop.
-1.	Destructive Filtering - If you need to traverse a collection and remove selected elements, then you need to use an explicit iterator so that you can call its remove method. You can avoid explicit traversal by using Collections’s removeIf method in java 8
-2.	Transforming - If you need to traverse a list or array and replace some or all of the values of its elements, you need the list iterator or array index in order to replace the value of the element.
-3.	Parallel Iteration – If you need to traverse multiple collection in parallel, then you need explicit control over the iterator or index variable. So, the all iterators or index variables can be advanced in lockstep.
+1.Destructive Filtering - If you need to traverse a collection and remove selected elements, then you need to use an explicit iterator so that you can call its remove method. You can avoid explicit traversal by using Collections’s removeIf method in java 8
+2.Transforming - If you need to traverse a list or array and replace some or all of the values of its elements, you need the list iterator or array index in order to replace the value of the element.
+3.Parallel Iteration – If you need to traverse multiple collection in parallel, then you need explicit control over the iterator or index variable. So, the all iterators or index variables can be advanced in lockstep.
 
 #### Item 59: Know and use Libraries
 By using a standard library,
-1.	You take advantage of the knowledge of the experts who wrote it and the experience of who used it before you.
-2.	Don’t have to waste your time writing ad hoc solutions to problems that are only marginally related to your work.
-3.	Their performance tends to improve over time
-4.	Your code will be easily readable, maintainable, and reusable.
+1.You take advantage of the knowledge of the experts who wrote it and the experience of who used it before you.
+2.Don’t have to waste your time writing ad hoc solutions to problems that are only marginally related to your work.
+3.Their performance tends to improve over time
+4.Your code will be easily readable, maintainable, and reusable.
+
 Numerous features are added to the libraries in every major release, and it pays to keep abreast of these additions
 Every programmer should be familiar with:
 java.lang
@@ -686,9 +700,9 @@ To achieve acceptable performance, use StringBuilder in place of String.
 #### Item 64: Refer to objects by their interfaces.
 If appropriate interface types exist, then parameters, return values, variables, and fields should all be declared using interface types.
 If there is not an appropriate interface we can refer to the object by a class. Like:
-1.	Value classes: String, BigDecimal...
-2.	Framework classes
-3.	Classes that extend the interface functionality with extra methods.
+1.Value classes: String, BigDecimal...
+2.Framework classes
+3.Classes that extend the interface functionality with extra methods.
 
 #### Item 65: Prefer interfaces to reflection
 Reflection is a powerful facility but has many disadvantages. When you need to work with classes unknown at compile time, try to only use it to instantiate object and then access them by using an interface of superclass known at compile time.
@@ -701,13 +715,15 @@ Do not strive to write fast programs—strive to write good ones; speed will fol
 protocols, and persistent data formats. When you’ve finished building the system, measure its performance. If it’s fast enough, you’re done. If not, locate the source of the problem with the aid of a profiler and go to work optimizing the relevant parts of the system. The first step is to examine your choice of algorithms: no amount of low-level optimization can make up for a poor choice of algorithm. Repeat this process as necessary, measuring the performance after every change, until you’re satisfied
 
 #### Item 68: Adhere to generally accepted naming conventions
-Identifier Type	Examples
-Package	org.junit.jupiter, com.google.common.collect
-Class or Interface	Stream, FutureTask, LinkedHashMap, HttpServlet
-Method or Field	remove, groupBy, getCrc
-Constant Field	MIN_VALUE, NEGATIVE_INFINITY
-Local Variable	i, denom, houseNum
-Type Parameter	T, E, K, V, X, R, U, V, T1, T2
+
+| Identifier Type     | Examples                                      |
+| -------------       | -------------------------------------------   |
+| Package             | org.junit.jupiter, com.google.common.collect  |
+| Class or Interface  | Stream, FutureTask, LinkedHashMap, HttpServlet|
+| Method or Field     | remove, groupBy                               |
+| Constant Field      | MIN_VALUE, NEGATIVE_INFINITY                  |
+| Local Variable      | i, denom, houseNum                            |
+| Type Parameter      | T, E, K, V, X, R, U, V, T1, T2                |
 
 
 ### Chapter:10 Exceptions
@@ -725,13 +741,14 @@ When used sparingly, checked exceptions can increase the readability of programs
 
 #### Item: 72 Favor the use of standard exceptions:
 When appropriate, use the standard exception instead of creating a new one.  Here are the list of common exceptions.
-Exception	Occasion for Use
-IllegalArgumentException	Non-null parameter value is inappropriate
-IllegalStateException	Object state is inappropriate for method invocation
-NullPointerException	Parameter value is null where prohibited
-IndexOutOfBoundsException	Index parameter value is out of range
-ConcurrentModificationException	Concurrent modification of an object has been detected where it is prohibited
-UnsupportedOperationException	Object does not support method
+
+Exception	                 Occasion for Use
+IllegalArgumentException	 Non-null parameter value is inappropriate
+IllegalStateException	         Object state is inappropriate for method invocation
+NullPointerException	         Parameter value is null where prohibited
+IndexOutOfBoundsException	 Index parameter value is out of range
+ConcurrentModificationException	 Concurrent modification of an object has been detected where it is prohibited
+UnsupportedOperationException	 Object does not support method
  
 #### Item 73: Throw exceptions that are appropriate to the abstraction
 Higher layers should catch lower-level exceptions and, in their place, throw exceptions that can be explained in terms of the higher-level abstraction. Make sure to use chaining in order to the underlying cause of failure.
@@ -742,11 +759,17 @@ For example,
                …..
          }  catch(LowerLevelException cause) {
          throw new HigherLevelException(cause) ;     
-}
+       }
+
+```
+       
 Then create a chaining aware constructor in the HigherLevelException like below,
+
+``` 
 class HigherLevelException extends Exception {
     public HigherLevelException(Throwable cause){
          super(cause);
+     }
 }
 ```
 
@@ -756,6 +779,7 @@ Use the Javadoc @throws tag to document each exception that a method thrown and 
 
 #### Item: 75 Include failure-capture information in detail message
 To capture a failure, the detail message of an exception should contain the information of all parameters and fields that contributed to the exception. Do not include passwords and encryption keys in the message.
+
 ```
 public IndexOutOfBoundsException(int lowerBound, int upperBound, int index) {
 //Generate a detail message that captures the failure.	
@@ -777,8 +801,9 @@ An empty catch block defeats the purpose of exceptions, which is to force you to
 
 ``` 
 try{
-}catch(TimeoutException |ExecutionException ignored){
-//use default: minimal coding is required and required
+...........
+   }catch(TimeoutException |ExecutionException ignored){
+   //use default: minimal coding is required and required
 }
 
 ```
