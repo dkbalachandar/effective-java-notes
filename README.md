@@ -2,7 +2,7 @@
 
 #### Disclaimer
 
-This is a summary/notes of the book "Effective Java by Joshua Bloch".  The below notes are my personal notes and I hope it's not a copyright infringement. If it is, please contact me in order to remove this file from github.
+This is a summary of the book "Effective Java by Joshua Bloch". The below are my personal notes and I hope it's not a copyright infringement. If it is, please contact me in order to remove this file from github.
 
 ### Chapter 2: Creating and Destroying Objects
 
@@ -14,15 +14,18 @@ must precede their destruction.
 #### Item 1: Consider static factory methods instead of constructors
 Instead of adding multiple constructors for a class, we can create static factory methods which has advantages and disadvantages.
 For example, the constructor BigInteger(int, int, Random), which returns a BigInteger that is probably prime, would have been better expressed as a static factory method named BigInteger.probablePrime.
+
 Advantages:
 1.	Unlike constructors, static factor methods they have names
 2.	They are not required to create a new object each time
 3.	We can return an object of any subtype of their return type
 4.	They reduce the verbosity of creating parameterized type instances.
+
 Disadvantages:
 1.	The classes without providing public or protected constructors but have only static factory methods can’t be sub classed
 2.	They are not readily distinguishable from other static methods
- Here are some of the common static factory methods
+
+Here are some of the common static factory methods
 1.	from – Type conversion which takes a simple parameter and return an instance of this type.
 Date d = Date.from(instant)
 2.	Of – An aggregation method that takes multiple parameters and return returns an instance of this type that incorporates them.
@@ -54,24 +57,25 @@ Static factories and constructors have some limitation and they do not scale wel
 3.	Builder Pattern - Combines the safety of the telescoping pattern and the readability of JavaBean pattern.  In order to create an object, we have to create Builder class. So, the cost of creating builder class is the disadvantage here. It’s good when constructors or static factories would have more than a handful of parameters
 
 #### Item 3: Enforce the singleton property with a private constructor or an enum type
-We can create a private constructor in the class and static factory method to return an instance of that class.  We can throw an exception in the private constructor if client code access it through reflections.  In the below approach, whenever the object is deserialized a new instance would be created so to avoid this, make all fields transient and implement readResolve method
+We can create a private constructor in the class and static factory method to return an instance of that class.  We can throw an exception in the private constructor if client code access it through reflections.  
 
 ````
 public class Elvis {
     private static final Elvis INSTANCE = new Elvis();
     private Elvis() { ... }
     public static Elvis getInstance() { return INSTANCE;}
-    ublic void leaveTheBuilding() { ... }
+    public void leaveTheBuilding() { ... }
 }
 
 ````
 
 A single-element enum type is often the best way to implement a singleton.
+
 ````
 // Enum singleton - the preferred approach
 public enum Elvis {
-INSTANCE;
-public void leaveTheBuilding() { ... }
+   INSTANCE;
+   public void leaveTheBuilding() { ... }
 }
 ````
 #### Item 4: Enforce noninstantiability with a private constructor
@@ -93,14 +97,12 @@ Do not use singleton or static utility classes to implement a class the depends 
 ````
 // Dependency injection provides flexibility and testability
 public class SpellChecker {
-
-private final Lexicon dictionary;
-public SpellChecker(Lexicon dictionary) {
-this.dictionary =
-Objects.requireNonNull(dictionary);
-}
-public boolean isValid(String word) { ... }
-public List<String> suggestions(String typo) { ... }
+  private final Lexicon dictionary;
+  public SpellChecker(Lexicon dictionary) {
+    this.dictionary = Objects.requireNonNull(dictionary);
+  }
+  public boolean isValid(String word) { ... }
+  public List<String> suggestions(String typo) { ... }
 }
 ````
 ### Item 6: Avoid creating unnecessary objects
@@ -138,18 +140,18 @@ Nulling out object references should be the exception rather than the norm. When
 For example, Stack.
 ```
 public Object pop() {
-if (size == 0)
+  if (size == 0)
      throw new EmptyStackException();
-Object result = elements[--size];
-elements[size] = null; // Eliminate obsolete
-reference
-return result;
+  Object result = elements[--size];
+  elements[size] = null; // Eliminate obsolete reference
+  return result;
 }
 ```
-Another common source of memory leaks is caches. A third common source of memory leaks is listeners and other callbacks.
+Another common source of memory leaks are caches,  listeners and other callbacks.
 
 #### Item 8: Avoid finalizers and cleaners
 Finalizers are unpredictable, often dangerous, and generally unnecessary. 
+
 Cleaners are less dangerous than finalizers but still unpredictable slow and generally unnecessary.
 
 In summary, don’t use cleaners, or in releases prior to Java 9, finalizers,
@@ -161,10 +163,10 @@ Always use try-with-resources in preference to try finally
 when working with resources that must be closed. The resulting
 code is shorter and clearer, and the exceptions that it generates are more
 useful. 
+
 The try-with-resources statement makes it easy to write correct code
 using resources that must be closed, which was practically impossible using
 try-finally.
-
 
 ### Chapter 3. Methods Common to All Objects
 This chapter tells you when and how to override the nonfinal Object methods.
@@ -191,8 +193,10 @@ Whenever you implement a  value class that has a sensible ordering, you should h
 
 #### Item 15: Minimize the accessibility of classes and members
 A well-designed component hides all its implementation details, cleanly separating its API from its implementation. Components then communicate only through their APIs and are oblivious to each other’s inner workings. This concept, known as information hiding or encapsulation, is a fundamental tenet of software design.
+
 The rule of thumb is simple: make each class or member as inaccessible as possible. In other words, use the lowest possible access level consistent with the proper functioning of the software that you are writing.
-Item 16: In public classes, use accessor methods, not public fields
+
+#### Item 16: In public classes, use accessor methods, not public fields
 Public classes should never expose mutable fields. Its less harmful though still questionable, for public classes to expose immutable fields. It is, however sometimes desirable for package-protected or private nested classes to expose fields, whether mutable or immutable.
 
 #### Item 17: Minimize Mutability
@@ -209,7 +213,8 @@ With inheritance, you don't know how your class will react with a new version of
 Also, if there is a flaw in the API of the superclass you will suffer from it too. With composition, you can define your own API for your class.
 As a rule of thumb, to know if you need to choose inheritance over composition, you need to ask yourself if B is really a subtype of A.
 
-``` //Wrapper class – Uses composition in place of inheritance.
+``` 
+//Wrapper class – Uses composition in place of inheritance.
 public class InstrumentedSet<E> extends ForwardingSet<E> {
 	private int addCount = 0;
 	public InstrumentedSet (Set<E> s){
@@ -248,11 +253,11 @@ public class ForwardingSet<E> implements Set<E> {
 #### Item 19: Design and document for inheritance or else prohibit it
 
 The class must document its self-use of overridable methods. 
-To document a class so that it can be safely sub classed, you must describe implementations details. To allow programmers to write efficient subclasses without undue pain, a class may have to provide hooks into its internal working in the form of judiciously chosen protected methods.
-The only way to test a class designed for inheritance is to write subclasses. You must test your class by writing subclasses before you release it.
+To document a class so that it can be safely sub classed, you must describe implementations details. To allow programmers to write efficient subclasses without undue pain, a class may have to provide hooks into its internal working in the form of judiciously chosen protected methods. The only way to test a class designed for inheritance is to write subclasses. You must test your class by writing subclasses before you release it.
 Constructor must not invoke overridable methods.
 If a class is not designed and documented for inheritance it should be me made forbidden to inherit it, either by making it final, or making its constructors private (or package private) and use static factories.
-Item 20: Prefer Interfaces to Abstract Classes
+
+#### Item 20: Prefer Interfaces to Abstract Classes
 
 ### Item 21: Design interfaces for posterity
 With Java 8, it's now possible to add new methods in interfaces without breaking old implementations thanks to default methods. But It needs to be done carefully since it can still break old implementations that will fail at runtime.
@@ -286,10 +291,10 @@ For example,
 	class Figure{
 		enum Shape {RECTANGLE, CIRCLE};
 
-                 //Tag field 
+    //Tag field 
 		final Shape shape;
 
-                 //rectangle fields    
+     //rectangle fields    
 		double length;
 		double width;
 
@@ -323,15 +328,15 @@ For example,
 ```
 Class hierarchy is a better replacement for a tagged class. It makes the code is simple and clear. 
 
-``` abstract class Figure{
+``` 
+  abstract class Figure{
 		abstract double area();
 	}
 	class Circle extends Figure{
 		final double radius;
 
-		Circle(double radius) { this.radius=radius;}
-
-		double area(){return Math.PI * (radius * radius);}
+	  Circle(double radius) { this.radius=radius;}
+	  double area(){return Math.PI * (radius * radius);}
 	}
 	class Rectangle extends Figure{
 		final double length;
@@ -354,10 +359,10 @@ Class hierarchy is a better replacement for a tagged class. It makes the code is
 
 #### Item 24: Favor static member classes over nonstatic
 If a member class does not need access to its enclosing instance, then declare it static. If the class is non static, each instance will have a reference to its enclosing instance. That can result in the enclosing instance not being garbage collected and memory leaks.
-Item 25: Limit sources files to a single top-level class
+
+### Item 25: Limit sources files to a single top-level class
 Never put multiple top-level classes or interfaces in a single source file. Following rule guarantees that you can’t have multiple definitions for a single class at compile time.
 If you are tempted to put multiple top-level classes into single source file, consider using static member classes. Because it enhances readability.
-
 
 ### Chapter: 5 Generics
 
@@ -368,18 +373,23 @@ There are two exceptions to this rule.
 List.class or String[].class is legal but not List<String>.class and List<?>.class
 2.	Instanceof operator. 
 Because generics information erased at runtime, its illegal to use the instance of operator on parameterized types. 
-      //Legitimate usa of instance of raw type
+``` 
+//Legitimate usa of instance of raw type
 if (o instanceof Set){
 	Set<?> = (Set<?>) o;
 }
+```
 
 #### Item: 27 Eliminate unchecked warnings
 Eliminate every unchecked warning that you can. 
 If you can’t eliminate it, but you can prove that the code that provoked the warning is type safe, then suppress the warning with an @SuppressWarnings(“unchecked”) annotation and also add a comment why its safe to do.
 Always use the SuppressWarnings on the smallest scope as possible.
-	Set<Lark> exaltation = new HashSet(); Warning, unchecked conversion.
 
-	Set<Lark> exaltation = new HashSet<>(); Good
+```
+   Set<Lark> exaltation = new HashSet(); Warning, unchecked conversion.
+
+ 	Set<Lark> exaltation = new HashSet<>(); Good
+```
 
 #### Item 28: Prefer lists to arrays
 Arrays are covariant which means if Sub is a subtype of Super, then the array type Sub[] is a subtype of  the array type Super[]
@@ -501,9 +511,7 @@ Use the override annotation on every method declaration that you believe to over
 #### Item 41: Use marker interfaces to define types
 A marker interface is an interface that contains no method declaration. It only "marks" a class that implements this interface. One common example in the JDK is Serializable. Using marker interface results in compile type checking.
 
-### Chapter:7
-
-### Lambdas and streams
+### Chapter:7 Lambdas and streams
 
 #### Item 42 : Prefer Lambdas to anonymous classes
 Lambdas are the best way to represent function objects. As a rule of thumb, lambdas need to be short to be readable. Three lines seems to be a reasonable limit. Also, the lambdas need to be self-explanatory since it lacks name or documentation. Always think in terms of readability.
@@ -524,7 +532,6 @@ Some tasks are best accomplished with streams, and others with iteration. Many t
 
 #### Item 46: Prefer side-effect-free functions in streams
 The essence of programming stream pipelines is side-effect free function objects. This applies to all of the many function objects passed to streams and related objects. The terminal operation forEach should only be used to report the result of a computation performed by a stream, not to perform the computation. In order to use streams properly, you have to know about collectors. The most important collector factories are toList, toSet, toMap, groupingBy, and joining
-
 
 #### Item 47 Prefer Collection to Stream as a return type
 When writing a method that returns a sequence of elements, remember that some of your users may want to process them as a stream while others may want to iterate over them. Try to accommodate both groups. If it’s feasible to return a collection, do so. If you already have the elements in a collection or the number of elements in the sequence is small enough to justify creating a new one, return a standard collection such as ArrayList. Otherwise, consider implementing a custom collection as we did for the power set. If it isn’t feasible to return a collection, return a stream or iterable, whichever seems more natural. If, in a future Java release, the Stream interface declaration is modified to extend Iterable, then you should feel free to return streams because they will allow for both stream processing and iteration.
@@ -553,14 +560,12 @@ public Period(Date start, Date end) {
 	}
 ```
 
-
 #### Item 51: Design method signatures carefully
 1.	Choose method names carefully
 2.	Don’t go overboard in providing convenience methods.
 3.	Avoid long parameter lists. Use helper class and Builder pattern
 4.	For parameter types, favor interfaces over classes.
 5.	Prefer two-element enum types to Boolean parameter
-
 
 #### Item 52: Use overloading judiciously
 Avoid confusing use of overloading, Refer the below example,
@@ -610,7 +615,6 @@ Never return null in place of an empty array or collection. It makes your API mo
 
 #### Item 55 : Return Optionals judiciously
 You should declare a method to return Optional if it might not be able to return a result and clients will have to perform special processing if no result is returned. You should never use an optional of a boxed primitive. For performance critical methods, it may be better to return a null or throw an exception.
-
 
 #### Item 56: Write doc comments for all exposed API elements
 Documentation summary are the best, more effective way to document your API. Their use should be considered mandatory for all the exported elements.  Adopt a consistent style that adheres to standard conventions. 
@@ -662,7 +666,6 @@ When you must use boxed primitives:
 3.	When making reflective invocations
 In other cases prefer primitives.
 
-
 #### Item 62: Avoid Strings where other types are more appropriate
 Strings are more cumbersome than other types.
 Strings are less flexible than other types.
@@ -693,7 +696,6 @@ Reflection is a powerful facility but has many disadvantages. When you need to w
 #### Item 66: Use native methods judiciously
 It's rare that you will need to use native methods to improve performances. If it's needed to access native libraries use as little native code as possible. A single bug in the native code can corrupt your entire application.
 
-
 #### Item 67: Optimize judiciously
 Do not strive to write fast programs—strive to write good ones; speed will follow. But do think about performance while you’re designing systems, especially while you’re designing APIs, wire-level
 protocols, and persistent data formats. When you’ve finished building the system, measure its performance. If it’s fast enough, you’re done. If not, locate the source of the problem with the aid of a profiler and go to work optimizing the relevant parts of the system. The first step is to examine your choice of algorithms: no amount of low-level optimization can make up for a poor choice of algorithm. Repeat this process as necessary, measuring the performance after every change, until you’re satisfied
@@ -708,11 +710,10 @@ Local Variable	i, denom, houseNum
 Type Parameter	T, E, K, V, X, R, U, V, T1, T2
 
 
-### Exceptions
+### Chapter:10 Exceptions
 
 #### Item 69: Use exceptions only for exceptional conditions
 Exceptions are designed for exceptional conditions. Don’t use them for ordinary control flow and don’t write API’s that force others to do so. 
-
 
 #### Item: 70: Use checked exception for recoverable conditions and runtime exceptions for programming errors.
 Use checked exceptions for conditions from which the caller can reasonably be expected to recover. 
@@ -732,7 +733,6 @@ IndexOutOfBoundsException	Index parameter value is out of range
 ConcurrentModificationException	Concurrent modification of an object has been detected where it is prohibited
 UnsupportedOperationException	Object does not support method
  
-
 #### Item 73: Throw exceptions that are appropriate to the abstraction
 Higher layers should catch lower-level exceptions and, in their place, throw exceptions that can be explained in terms of the higher-level abstraction. Make sure to use chaining in order to the underlying cause of failure.
 For example,
@@ -749,7 +749,6 @@ class HigherLevelException extends Exception {
          super(cause);
 }
 ```
-
 
 #### Item: 74 Document all exceptions thrown by each method
 Always declare checked exceptions individually, and document precisely the conditions under which one is thrown
