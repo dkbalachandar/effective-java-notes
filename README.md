@@ -4,6 +4,8 @@
 
 This is a summary of the book "Effective Java" wrote by Joshua Bloch. The below are my personal notes and I hope it's not a copyright infringement. If it is, please contact me in order to remove this from github.
 
+I have not included all the items but will do it gradually. 
+
 ### Chapter 2: Creating and Destroying Objects
 
 This chapter concerns creating and destroying objects. When and how to create them, when and how to avoid creating them, how to ensure they are destroyed in a timely manner, and how to manage any cleanup actions that must precede their destruction.
@@ -556,12 +558,14 @@ Lambdas are the best way to represent function objects. As a rule of thumb, lamb
 
 #### Item 43: Prefer methods references to lambdas
 Method references often provide a more succinct alternative to lambdas. Where method references are shorter and clearer, use them; where they are not, stick with lambdas.
-Method ref type	Example	Lambda equivalent
-Static	Integer::parseInt	str -> Integer.parseInt(str)
-Bound	Instant.now()::isAfter	Instant then = Instant.now(); t->then.isAfter(t)
-Unbound	String::toLowerCase	str -> str.toLowerCase()
-Class Constructor	TreeMap<K,V>::new	() -> new TreeMap<K,V>
-Array Constructor	int[]::new	len -> new int[len]
+
+| Method ref type     | Example                 | Lambda equivalent                               | 
+| ------------------- | ------------------------| ------------------------------------------------| 
+|Static	              | Integer::parseInt       | str -> Integer.parseInt(str) 			  |
+|Bound	              | Instant.now()::isAfter  | Instant then = Instant.now(); t->then.isAfter(t)|
+|Unbound              |	String::toLowerCase     | str -> str.toLowerCase()			  |
+|Class Constructor    |	TreeMap<K,V>::new       | () -> new TreeMap<K,V>			  |
+|Array Constructor    |	int[]::new              | len -> new int[len]      			  |
 
 #### Item 44: Favor the use of standard functional interface
 
