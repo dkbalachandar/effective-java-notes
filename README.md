@@ -27,23 +27,30 @@ Disadvantages:
 1.The classes without providing public or protected constructors but have only static factory methods can’t be sub classed
 2.They are not readily distinguishable from other static methods
 
-Here are some of the common static factory methods
-
+Here are some of the common static factory methods.
 1.from – Type conversion which takes a simple parameter and return an instance of this type.
 Date d = Date.from(instant)
+
 2.Of – An aggregation method that takes multiple parameters and return returns an instance of this type that incorporates them.
 Set<Rank> faceCards = EnumSet.of(JACK, QUEEN, KING)
+	
 3.valueOf- A more verbose alternative to from and of. Returns an instance that has the same value its parameters.
 BigInteger prime = BigInteger.valueOf(Integer.MAX_VALUE);
+
 4.instance or getInstance – Takes parameters  if any and return an instance of the class.
 StackWalker luke = StackWalker.getInstance(options);
+
 5.create or newInstance – Same as getInstance but each instance that is returned is distinct from all others.
+
 6.getType – Like getInstance but if the factory method is in different class. 
 FileStore fs = Files.getFileStore(path);
+
 7.newType – Like newInstance but if the factory method is in different class.
 BufferedReader br = Files.newBufferedReader(path);
+
 8.type – A concise alternative to getType and newType,
 List<Complaint> litany = Collections.list(legacyLitany);
+	
 Often static factories are preferable, so avoid the reflex to provide public constructors without first considering static factories.
 
 
@@ -312,14 +319,14 @@ They have lot of boilerplate code, bad readability, they increase the memory foo
 For example,
 
 ```
-// Tagged Class
+       // Tagged Class
 	class Figure{
 		enum Shape {RECTANGLE, CIRCLE};
 
-    //Tag field 
+                //Tag field 
 		final Shape shape;
 
-     //rectangle fields    
+                //rectangle fields    
 		double length;
 		double width;
 
@@ -442,6 +449,29 @@ Generic methods, like generic types, are safer and easier to use than methods re
 
 #### Item 31: Use bounded wildcards to increase API flexibility
 
+Parameterized types are invariant. List<String> is not a subtype of List<Object>. 
+
+If we have a stack implementation and want to add two methods pushAll, popAll, we can do it in the below way woth bounded wildcards
+
+```
+// Wildcard type for a parameter that serves as an E producer
+public void pushAll(Iterable<? Extends E> src){
+	for (E e : src) {
+		push(e);
+	}
+}
+
+// Wildcard type for parameter that serves as an E consumee
+public void popAll(Collection<? super E> dst){
+	while(!isEmpty()) {
+		dst.add(pop());
+	}
+}
+```
+
+In the Stack example, pushAll’s src parameter produces E instances for use by the Stack, so the appropriate type for src is Iterable<? extends E>; popAll’s dst parameter consumes E instances from the Stack, so the appropriate type for dst is Collection<? super E>. Hence remember this mnemonic "PECS stands for producer-extends, consumer-super" to determine when to use extends and super.
+
+
 #### Item 32: Combine generics and varargs judiciously
 
 #### Item 33: Consider typesafe hetrogenous containers
@@ -495,7 +525,7 @@ public class Text{
 	text.applyStyles(EnumSet.of(Style.BOLD, Style. ITALIC));
  ```
  
-It is a good practice to accept the interface Set instead of the implementation EnumSet.
+It is a good practice to accept the interface 'Set' instead of the implementation 'EnumSet'.
 
 #### Item 37: Use EnumMap instead of ordinal indexing
 Use EnumMap to store data by a certain enum. You can still use Enum’s ordinal as an index and store it but it’s a bad practice.  Prefer to use EnumMap to do that, So we can have a Enum as Key.
