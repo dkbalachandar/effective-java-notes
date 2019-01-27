@@ -2,7 +2,7 @@
 
 #### Disclaimer
 
-This is a summary of the book "Effective Java"  by Joshua Bloch. The below are my personal notes and I hope it's not a copyright infringement. If it is, please contact me in order to remove this file from github.
+This is a summary of the book "Effective Java" wrote by Joshua Bloch. The below are my personal notes and I hope it's not a copyright infringement. If it is, please contact me in order to remove this from github.
 
 ### Chapter 2: Creating and Destroying Objects
 
@@ -10,6 +10,7 @@ This chapter concerns creating and destroying objects. When and how to create th
 
 #### Item 1: Consider static factory methods instead of constructors
 Instead of adding multiple constructors for a class, we can create static factory methods which has advantages and disadvantages.
+
 For example, the constructor BigInteger(int, int, Random), which returns a BigInteger that is probably prime, would have been better expressed as a static factory method named BigInteger.probablePrime.
 
 Advantages:
@@ -17,7 +18,7 @@ Advantages:
 1.Unlike constructors, static factor methods they have names
 2.They are not required to create a new object each time
 3.We can return an object of any subtype of their return type
-4.They reduce the verbosity of creating parameterized type instances.
+4.They reduce the verbosity of creating parameterized type instances
 
 Disadvantages:
 
@@ -56,6 +57,7 @@ Static factories and constructors have some limitation and they do not scale wel
 1.Telescoping constructor pattern – provide a constructor with only required parameters, another one with a single optional parameter, a third with two optional parameters and so on. It still works but its harder to read it.
 
 2.JavaBean pattern – Create a parameter less constructor and then call the setter methods to set the required parameters and each optional parameter. A JavaBean may be in an inconsistent state partway through its construction and also it prevents the possibility of making a class immutable. 
+
 3.Builder Pattern - Combines the safety of the telescoping pattern and the readability of JavaBean pattern.  In order to create an object, we have to create Builder class. So, the cost of creating builder class is the disadvantage here. It’s good when constructors or static factories would have more than a handful of parameters
 
 #### Item 3: Enforce the singleton property with a private constructor or an enum type
@@ -142,7 +144,7 @@ The variable Sum is declared as Long so every time when we perform the add opera
 Nulling out object references should be the exception rather than the norm. Do not overcompensate by nulling out every object. 
 Whenever a class manages its own memory, the programmer should be alert for memory leaks. 
 
-For example, Stack.
+For example, Refer the below code from Stack implementation. The reference to an item becomes obsolete as soon as its popped out off the stack. So we have to nulllif the object reference so that it will be garbage collected soon. 
 ```
 public Object pop() {
   if (size == 0)
@@ -189,7 +191,7 @@ When you override the equals method, you must adhere to its general contract. He
 5.	For any non-null reference value x, x.equals(null) must return false.
 
 #### Item 12: Always override toString
-The general contract for toString says that the returned string should be “a concise but informative representation that is easy for a person to read. Providing a good toString implementation makes your class much more pleasant to use and makes systems using the class easier to debug.
+The general contract for toString says that the returned string should be “a concise but informative representation that is easy for a person to read". Providing a good toString implementation makes your class much more pleasant to use and makes systems using the class easier to debug.
 
 #### Item 13: Override clone judiciously
 A better approach to object copying is to provide a copy constructor or copy factory. A notable exception to this rule is arrays, which are best copied with the clone method.
@@ -407,9 +409,9 @@ If you can’t eliminate it, but you can prove that the code that provoked the w
 Always use the SuppressWarnings on the smallest scope as possible.
 
 ```
-   Set<Lark> exaltation = new HashSet(); Warning, unchecked conversion.
+        Set<Lark> exaltation = new HashSet(); //Warning, unchecked conversion.
 
- 	Set<Lark> exaltation = new HashSet<>(); Good
+ 	Set<Lark> exaltation = new HashSet<>(); //Good
 ```
 
 #### Item 28: Prefer lists to arrays
@@ -428,7 +430,7 @@ Generics are invariant for any distinct types Type1 and Type2, List<Type1> is ne
 
 Arrays are reified: Arrays know and enforce their element types at runtime. 
 Generics are erasure: Enforce their type constrains only at compile time and discard (or erase) their element type information at runtime.
-Its always prefer to catch the error sooner than later so prefer Lists,
+Its always prefer to catch the error sooner than later so prefer Lists.
 
 #### Item 29: Favor Generic Types
 Generic types are safer and easier to use than types that require casts in client code. When you design new types, make sure that they can be used without such casts. 
@@ -438,11 +440,26 @@ Generic methods, like generic types, are safer and easier to use than methods re
 
 #### Item 31: Use bounded wildcards to increase API flexibility
 
+#### Item 32: Combine generics and varargs judiciously
+
+#### Item 33: Consider typesafe hetrogenous containers
+
 ### Chapter: 6 Enums and annotations
 
 #### Item 34: Use Enum instead of int constants
 Enums are more readbale, safer and more powerful. 
 
+```
+//The int enum pattern - serverly deficient
+public static final int APPLE_FUJI=0;
+public static final int APPLE_PIPPIN=1;
+public static final int APPLE_GRANNY_SMITH=3;
+....
+
+//Using enum 
+public enum Apple{FUJI, PIPPIN, GRANNY_SMITH}
+
+```
 #### Item 35: Use instance fields instead of ordinals
 All enums have an ordinal method, which returns the numerical position of each enum constant in its type. You may be tempted to derive an associated int value from the ordinal as it’s a maintenance nightmare. If the constants are ordered the numberOfMusicians will break.
 ```
@@ -524,6 +541,7 @@ public enum ExtendedOperation implements Operation{
 ```
 
 #### Item 39: Prefer annotations to naming pattern
+All programmers should use the predefined annotation types that java provodes. 
 
 #### Item 40: Consistently use the override annotation
 Use the override annotation on every method declaration that you believe to override a superclass declaration, With one exception. In concreate classes, you need not annotate methods that you believe to override abstract method declarations (though its not harmful to do so).
