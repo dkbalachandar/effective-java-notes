@@ -13,30 +13,33 @@ Instead of adding multiple constructors for a class, we can create static factor
 For example, the constructor BigInteger(int, int, Random), which returns a BigInteger that is probably prime, would have been better expressed as a static factory method named BigInteger.probablePrime.
 
 Advantages:
-1.	Unlike constructors, static factor methods they have names
-2.	They are not required to create a new object each time
-3.	We can return an object of any subtype of their return type
-4.	They reduce the verbosity of creating parameterized type instances.
+
+1.Unlike constructors, static factor methods they have names
+2.They are not required to create a new object each time
+3.We can return an object of any subtype of their return type
+4.They reduce the verbosity of creating parameterized type instances.
 
 Disadvantages:
-1.	The classes without providing public or protected constructors but have only static factory methods can’t be sub classed
-2.	They are not readily distinguishable from other static methods
+
+1.The classes without providing public or protected constructors but have only static factory methods can’t be sub classed
+2.They are not readily distinguishable from other static methods
 
 Here are some of the common static factory methods
-1.	from – Type conversion which takes a simple parameter and return an instance of this type.
+
+1.from – Type conversion which takes a simple parameter and return an instance of this type.
 Date d = Date.from(instant)
-2.	Of – An aggregation method that takes multiple parameters and return returns an instance of this type that incorporates them.
+2.Of – An aggregation method that takes multiple parameters and return returns an instance of this type that incorporates them.
 Set<Rank> faceCards = EnumSet.of(JACK, QUEEN, KING)
-3.	valueOf- A more verbose alternative to from and of. Returns an instance that has the same value its parameters.
+3.valueOf- A more verbose alternative to from and of. Returns an instance that has the same value its parameters.
 BigInteger prime = BigInteger.valueOf(Integer.MAX_VALUE);
-4.	instance or getInstance – Takes parameters  if any and return an instance of the class.
+4.instance or getInstance – Takes parameters  if any and return an instance of the class.
 StackWalker luke = StackWalker.getInstance(options);
-5.	create or newInstance – Same as getInstance but each instance that is returned is distinct from all others.
-6.	getType – Like getInstance but if the factory method is in different class. 
+5.create or newInstance – Same as getInstance but each instance that is returned is distinct from all others.
+6.getType – Like getInstance but if the factory method is in different class. 
 FileStore fs = Files.getFileStore(path);
-7.	newType – Like newInstance but if the factory method is in different class.
+7.newType – Like newInstance but if the factory method is in different class.
 BufferedReader br = Files.newBufferedReader(path);
-8.	type – A concise alternative to getType and newType,
+8.type – A concise alternative to getType and newType,
 List<Complaint> litany = Collections.list(legacyLitany);
 Often static factories are preferable, so avoid the reflex to provide public constructors without first considering static factories.
 
@@ -49,7 +52,9 @@ public static Boolean valueOf(boolean b) {
 
 #### Item 2: Consider a builder when faced with many constructor parameters
 Static factories and constructors have some limitation and they do not scale well to large number of optional parameters. So, we may use any one of the below options.
+
 1.Telescoping constructor pattern – provide a constructor with only required parameters, another one with a single optional parameter, a third with two optional parameters and so on. It still works but its harder to read it.
+
 2.JavaBean pattern – Create a parameter less constructor and then call the setter methods to set the required parameters and each optional parameter. A JavaBean may be in an inconsistent state partway through its construction and also it prevents the possibility of making a class immutable. 
 3.Builder Pattern - Combines the safety of the telescoping pattern and the readability of JavaBean pattern.  In order to create an object, we have to create Builder class. So, the cost of creating builder class is the disadvantage here. It’s good when constructors or static factories would have more than a handful of parameters
 
@@ -266,6 +271,13 @@ If a class is not designed and documented for inheritance it should be me made f
 
 #### Item 20: Prefer Interfaces to Abstract Classes
 
+Intefaces is generally the best way to define a type that permits multiple implementations.
+
+Interfaces are ideal for defining mixins. Mixin is a type that a class can implement in addition to its primary type. For example, 
+Comparable interface is a mixin interface that allows a class declare that its instance are ordered with respect to other mutable comparable objects.
+
+Intefaces allow for the construction of nonhirearchical type frameworks. 
+
 ### Item 21: Design interfaces for posterity
 With Java 8, it's now possible to add new methods in interfaces without breaking old implementations thanks to default methods. But It needs to be done carefully since it can still break old implementations that will fail at runtime.
 
@@ -429,6 +441,7 @@ Generic methods, like generic types, are safer and easier to use than methods re
 ### Chapter: 6 Enums and annotations
 
 #### Item 34: Use Enum instead of int constants
+Enums are more readbale, safer and more powerful. 
 
 #### Item 35: Use instance fields instead of ordinals
 All enums have an ordinal method, which returns the numerical position of each enum constant in its type. You may be tempted to derive an associated int value from the ordinal as it’s a maintenance nightmare. If the constants are ordered the numberOfMusicians will break.
@@ -511,7 +524,6 @@ public enum ExtendedOperation implements Operation{
 ```
 
 #### Item 39: Prefer annotations to naming pattern
-
 
 #### Item 40: Consistently use the override annotation
 Use the override annotation on every method declaration that you believe to override a superclass declaration, With one exception. In concreate classes, you need not annotate methods that you believe to override abstract method declarations (though its not harmful to do so).
