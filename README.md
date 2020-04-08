@@ -54,7 +54,7 @@ List<Complaint> litany = Collections.list(legacyLitany);
 Often static factories are preferable, so avoid the reflex to provide public constructors without first considering static factories.
 
 
-```
+```java
 public static Boolean valueOf(boolean b) {
     return b ? Boolean.TRUE : Boolean.FALSE;
 }
@@ -74,7 +74,7 @@ Static factories and constructors have some limitation and they do not scale wel
 There are different ways to create singletons.
 We can create a private constructor in the class and static factory method to return an instance of that class.  We can throw an exception in the private constructor if client code access it through reflections.  
 
-````
+````java
 public class Elvis {
     private static final Elvis INSTANCE = new Elvis();
     private Elvis() { ... }
@@ -85,7 +85,7 @@ public class Elvis {
 ````
 A single-element enum type is often the best way to implement a singleton.
 
-````
+````java
 // Enum singleton - the preferred approach
 public enum Elvis {
    INSTANCE;
@@ -95,7 +95,7 @@ public enum Elvis {
 #### Item 4: Enforce noninstantiability with a private constructor
 Attempting to enforce noninstantiability by making a class abstract does not work as the subclasses can extend this and instantiate it. So create a private constructor in that class and optionally throw Assertion Error if someone tries to instantiate that class within that class itself
 
-````
+````java
 // Noninstantiable utility class
 public class UtilityClass {
     // Suppress default constructor for noninstantiability
@@ -108,7 +108,7 @@ public class UtilityClass {
 #### Item 5: Prefer Dependency Injection to hardwiring resource
 Do not use singleton or static utility classes to implement a class the depends on one or more underlying resource whose behavior affects that of the class, and do not have the class create that resource directly. Instead pass the resources, or factories to create them. This practice is known as dependency Injection, will greatly enhance the flexibility, reusability, and testability of a class.
 
-````
+````java
 // Dependency injection provides flexibility and testability
 public class SpellChecker {
   private final Lexicon dictionary;
@@ -134,7 +134,7 @@ The above version uses a single String instance rather than creating a new one.
 You can often avoid creating objects by using static factory methods. 
 
 Another way to create unnecessary objects is autoboxing.
-````
+````java
 private static long sum() {
   Long sum = 0L;
   for (long i = 0; i <= Integer.MAX_VALUE; i++){
@@ -154,7 +154,7 @@ Nulling out object references should be the exception rather than the norm. Do n
 Whenever a class manages its own memory, the programmer should be alert for memory leaks. 
 
 For example, Refer the below code from Stack implementation. The reference to an item becomes obsolete as soon as its popped out off the stack. So we have to nulllif the object reference so that it will be garbage collected soon. 
-```
+```java
 public Object pop() {
   if (size == 0)
      throw new EmptyStackException();
@@ -233,7 +233,7 @@ With inheritance, you don't know how your class will react with a new version of
 
 Also, if there is a flaw in the API of the superclass you will suffer from it too. With composition, you can define your own API for your class. As a rule of thumb, to know if you need to choose inheritance over composition, you need to ask yourself if B is really a subtype of A.
 
-``` 
+```java 
 //Wrapper class – Uses composition in place of inheritance.
 public class InstrumentedSet<E> extends ForwardingSet<E> {
 	private int addCount = 0;
@@ -297,7 +297,8 @@ For example, removeIf() method was added to the Collection interface in Java 8. 
 #### Item 22: Use interfaces only to define types
 Interfaces should be used only to define types. They should not be used merely to export constants.
 The constant interface pattern is a poor use of interfaces.
-``` //Constant interface antipattern. Do not use!
+```java
+ //Constant interface antipattern. Do not use!
 public interface PhysicalConstants {
 	static final double AVOGADROS_NUMBER = 6.022_140_857e23;
 	static final double BOLTZMAN_CONSTANT = 1.380_648_52e-23;
@@ -318,7 +319,7 @@ Tagged classes are verbose, error-prone and inefficient.
 They have lot of boilerplate code, bad readability, they increase the memory footprint and more shortcomings.
 For example,
 
-```
+```java
        // Tagged Class
 	class Figure{
 		enum Shape {RECTANGLE, CIRCLE};
@@ -360,7 +361,7 @@ For example,
 ```
 Class hierarchy is a better replacement for a tagged class. It makes the code is simple and clear. 
 
-``` 
+```java 
   abstract class Figure{
 		abstract double area();
 	}
@@ -405,7 +406,7 @@ There are two exceptions to this rule.
 List.class or String[].class is legal but not List<String>.class and List<?>.class
 2.	Instanceof operator. 
 Because generics information erased at runtime, its illegal to use the instance of operator on parameterized types. 
-``` 
+````java 
 //Legitimate usa of instance of raw type
 if (o instanceof Set){
 	Set<?> = (Set<?>) o;
@@ -417,7 +418,7 @@ Eliminate every unchecked warning that you can.
 If you can’t eliminate it, but you can prove that the code that provoked the warning is type safe, then suppress the warning with an @SuppressWarnings(“unchecked”) annotation and also add a comment why its safe to do.
 Always use the SuppressWarnings on the smallest scope as possible.
 
-```
+```java
         Set<Lark> exaltation = new HashSet(); //Warning, unchecked conversion.
 
  	Set<Lark> exaltation = new HashSet<>(); //Good
@@ -427,7 +428,7 @@ Always use the SuppressWarnings on the smallest scope as possible.
 Arrays are covariant which means if Sub is a subtype of Super, then the array type Sub[] is a subtype of  the array type Super[]
 Generics are invariant for any distinct types Type1 and Type2, List<Type1> is neither a subtype nor a supertype of List<Type2>
 
-```
+```java
 // Fails at runtime
 	Object[] objectArray = new Long[1];
 	objectArray[0] ="I don't fit in" // Throws ArrayStoreException
@@ -481,7 +482,7 @@ In the Stack example, pushAll’s src parameter produces E instances for use by 
 #### Item 34: Use Enum instead of int constants
 Enums are more readbale, safer and more powerful. 
 
-```
+```java
 //The int enum pattern - serverly deficient
 public static final int APPLE_FUJI=0;
 public static final int APPLE_PIPPIN=1;
@@ -494,7 +495,7 @@ public enum Apple{FUJI, PIPPIN, GRANNY_SMITH}
 ```
 #### Item 35: Use instance fields instead of ordinals
 All enums have an ordinal method, which returns the numerical position of each enum constant in its type. You may be tempted to derive an associated int value from the ordinal as it’s a maintenance nightmare. If the constants are ordered the numberOfMusicians will break.
-```
+```java
 //Abuse of ordinal to derive an associated value. Don’t do this
 	public enum Ensemble{
 		SOLO, DUET, TRIO...;
@@ -513,7 +514,7 @@ public enum Ensemble{
 
 #### Item 36: Use EnumSet instead of bit fields
 If the elements of an enumerated are used primarily in sets, use EnumSet.
-```
+```java
 public class Text{
 		public enum Style { BOLD, ITALIC, UNDERLINE, STRIKETHROUGH }
 
@@ -534,7 +535,7 @@ Use EnumMap to store data by a certain enum. You can still use Enum’s ordinal 
 
 Enums types can not extend another enum types.
 
-``` 
+```java 
 public interface Operation{
 		double apply(double x, double y);
 	}
@@ -554,7 +555,7 @@ public interface Operation{
 ``` 
 
 BasicOperation is not extensible, but the interface type Operation is, and it is the one used to represent operations in APIs.
-``` 
+```java 
 public enum ExtendedOperation implements Operation{
 		EXP("^"){
 			public double apply(double x, double y) {return Math.pow(x,y)}
@@ -627,7 +628,7 @@ hose restrictions. The Objects.requireNonNull method should be used for nullabil
 If a class has mutable components that it gets from or returns to any clients, the class must defensively copy these components. If the cost of the copy would be prohibitive and the class trusts its clients not to modify the components inappropriately, then the defensive copy may be replaced by documentation outlining the client’s responsibility not to modify the affected components.
 
 For example,
-```
+```java
 public Period(Date start, Date end) {
 		this.start = new Date(start.getTime());
 		this.end = new Date(end.getTime());
@@ -647,7 +648,7 @@ public Period(Date start, Date end) {
 #### Item 52: Use overloading judiciously
 Avoid confusing use of overloading, Refer the below example,
 
-```
+```java
 // Broken! - What does this program print?
 public class CollectionClassifier {
 	public static String classify(Set<?> s) {
@@ -676,7 +677,7 @@ String exports two overloaded factory methods, valueOf(Object) and valueOf(char[
 
 #### Item 53: Use varargs judiciously
 Varargs are invaluable when you need to define methods with a variable number of arguments. Precede the varargs with any required parameters and be aware of the performance consequences of using varargs(Array allocation and initialization).
-```
+```java
 // The right way to use varargs to pass one or more arguments
 	static int min(int firstArg, int... remainingArgs) {
 		int min = firstArg;
@@ -818,7 +819,7 @@ UnsupportedOperationException	 Object does not support method
 Higher layers should catch lower-level exceptions and, in their place, throw exceptions that can be explained in terms of the higher-level abstraction. Make sure to use chaining in order to the underlying cause of failure.
 For example,
 
-```
+```java
   	 try {
                …..
          }  catch(LowerLevelException cause) {
@@ -829,7 +830,7 @@ For example,
        
 Then create a chaining aware constructor in the HigherLevelException like below,
 
-``` 
+```java 
 class HigherLevelException extends Exception {
     public HigherLevelException(Throwable cause){
          super(cause);
@@ -844,7 +845,7 @@ Use the Javadoc @throws tag to document each exception that a method thrown and 
 #### Item: 75 Include failure-capture information in detail message
 To capture a failure, the detail message of an exception should contain the information of all parameters and fields that contributed to the exception. Do not include passwords and encryption keys in the message.
 
-```
+```java
 public IndexOutOfBoundsException(int lowerBound, int upperBound, int index) {
 //Generate a detail message that captures the failure.	
 super(String.format("Lower bound : %d, Upper bound : %d, Index : %d", lowerBound, upperBound, index));
@@ -863,7 +864,7 @@ For example, String has “substring” method and it does not change anything a
 #### Item: 77 Don’t ignore the exceptions
 An empty catch block defeats the purpose of exceptions, which is to force you to handle the exceptional conditions. If you choose to ignore an exception, the catch block should contain a comment explaining why it is appropriate to do so and the variable should be named ignored.
 
-``` 
+```java 
 try{
 ...........
    }catch(TimeoutException |ExecutionException ignored){
